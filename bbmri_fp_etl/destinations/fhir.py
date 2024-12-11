@@ -203,9 +203,9 @@ class FHIRDest:
 
         condition.code = CodeableConcept({
             'coding': [{
-                'system': data.disease.ontology,
-                'code': data.disease.code
-            }]
+                'system': d.ontology,
+                'code': d.code
+            } for d in [data.disease.main_code] + data.disease.mapping_codes]
         })
 
         condition.subject = FHIRReference({'reference': f'Patient/{patient_id}'})
@@ -273,16 +273,13 @@ class FHIRDest:
 
         disease_extensions = []
         if data.content_diagnosis is not None:
-            for d in data.content_diagnosis:
+            for disease in data.content_diagnosis:
                 disease_code = {
                     'coding': [{
                         'system': d.ontology,
                         'code': d.code
-                    }]
+                    } for d in [disease.main_code] + disease.mapping_codes]
                 }
-
-                if d.ontology == DiseaseOntology.ORPHANET:
-                    disease_code['coding'].extend(self._get_icd_10_codes(d))
 
                 disease_extensions.append(
                     Extension({
@@ -316,16 +313,6 @@ class FHIRDest:
 
     def _create_conditions_entry(self, patient_id, diagnosis_event):
         return [self._create_condition_entry(patient_id, de) for de in diagnosis_event]
-
-    def _get_icd_10_codes(self, disease_data):
-        icd_codes = self.orphacodes.orphaToIcd10(disease_data.code.split('_')[1])
-        if icd_codes is not None:
-            return [{
-                'system': DiseaseOntology.ICD_10,
-                'code': code['code']
-            } for code in icd_codes if code['mapping_type'] in ('E', 'BTNT')]
-        else:
-            return []
 
     @staticmethod
     def _transform_resource_id(id_):

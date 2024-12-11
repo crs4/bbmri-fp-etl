@@ -3,14 +3,13 @@ Modules with the models used between the sources and the destinations.
 The destinations expect to handle data with the models defined here.
 The sources have to output data using these models
 """
+from datetime import datetime
 from enum import Enum
 from enum import StrEnum
 from typing import List, Optional, NamedTuple
 
 from pydantic import BaseModel, Field
 from pydantic.types import date
-from datetime import datetime
-
 
 
 class TelecomType(StrEnum):
@@ -293,6 +292,7 @@ class AnatomicalSiteOntology(StrEnum):
     ICD_O_3 = 'icd-3'
     SNOMED = 'https://www.snomed.org/'
 
+
 class Name(BaseModel):
     given: str
     family: str
@@ -348,6 +348,11 @@ class SampleTypeOntologyCode(BaseModel):
     free_text: Optional[str] = Field(default=None)
 
 
+class Disease(BaseModel):
+    main_code: DiseaseOntologyCode
+    mapping_codes: Optional[List[DiseaseOntologyCode]]
+
+
 class Aggregate(BaseModel):
     id: str
     acronym: Optional[str] = Field(default=None)
@@ -373,6 +378,7 @@ class Collection(Aggregate):
     type: Optional[List[CollectionType]] = Field(default=None)
     disease: Optional[List[DiseaseOntologyCode]] = Field(default=None)
     biobank: Optional[Biobank] = Field(default=None)
+
 
 class EventType(StrEnum):
     DIAGNOSIS = 'diagnosis'
@@ -403,12 +409,14 @@ class Donor(BaseModel):
 class Sample(BaseModel):
     id: str
     type: SampleType  # the MIABIS Sample Type
-    additional_types: List[SampleTypeOntologyCode] = Field(default_factory=list)  # A list of other Sample Type if needed
-    content_diagnosis: Optional[List[DiseaseOntologyCode]] = Field(default_factory=list)
+    additional_types: List[SampleTypeOntologyCode] = Field(
+        default_factory=list)  # A list of other Sample Type if needed
+    content_diagnosis: Optional[List[Disease]] = Field(default_factory=list)
     creation_time: Optional[datetime] = Field(default=None)
     events: List[Event]
     collection: Collection
     anatomical_site: Optional[AnatomicalSiteOntologyCode] = Field(default=None)
+
 
 class StatusOntology(StrEnum):
     OMOP = 'https://athena.ohdsi.org/search-terms/terms?domain=Condition+Status&standardConcept=Standard'
@@ -423,8 +431,9 @@ class StatusOntologyCode(BaseModel):
 
 
 class DiagnosisEvent(Event):
-    disease: DiseaseOntologyCode
+    disease: Disease
     provenance: Optional[StatusOntologyCode] = Field(default=None)
+
 
 class SamplingEvent(Event):
     pass
@@ -433,4 +442,3 @@ class SamplingEvent(Event):
 class Case(BaseModel):
     donor: Donor
     samples: List[Sample]
-
