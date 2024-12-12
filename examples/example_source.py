@@ -4,8 +4,9 @@ from datetime import datetime, date
 
 from bbmri_fp_converter.converter import Converter
 from bbmri_fp_converter.destinations.fhir import FHIRDest
+from bbmri_fp_converter.destinations.omop import OMOPDest
 from bbmri_fp_converter.models import Donor, Sex, Case, SampleType, SamplingEvent, Sample, Collection
-from bbmri_fp_converter.serializer import JsonFile
+from bbmri_fp_converter.serializer import JsonFile, CSVFile
 from bbmri_fp_converter.sources import AbstractSource
 
 # simulating a situation where there is one collection of samples
@@ -100,6 +101,10 @@ if __name__ == '__main__':
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
-    destination = FHIRDest(JsonFile(output_dir))
-    c = Converter(source, destination, Converter.CASE)
+    fhir_destination = FHIRDest(JsonFile(output_dir))
+    c = Converter(source, fhir_destination, Converter.CASE)
+    c.run()
+
+    omop_destination = OMOPDest(CSVFile(output_dir))
+    c = Converter(source, omop_destination, Converter.CASE)
     c.run()

@@ -1,5 +1,5 @@
-import json
 import csv
+import json
 import os
 
 
@@ -17,21 +17,21 @@ class JsonFile(BaseOutput):
         with open(f'{self.output_dir}/{file_name}.json', 'w') as f:
             json.dump(obj, f, indent=2)
 
+
 class CSVFile(BaseOutput):
 
     def __init__(self, directory):
         self.output_dir = directory
 
-    def serialize(self, file_name, header,obj):
+    def serialize(self, file_name, header, obj):
         if os.path.isfile(f'{self.output_dir}/{file_name}.csv'):
-            with open(f'{self.output_dir}/{file_name}.csv', 'a',newline='') as f:
+            with open(f'{self.output_dir}/{file_name}.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
-                nr=[str(v) for v in obj]   
-                writer.writerow(nr)     
+                nr = [str(v) for v in obj]
+                writer.writerow(nr)
         else:
-            with open(f'{self.output_dir}/{file_name}.csv', 'w',newline='') as f:
+            with open(f'{self.output_dir}/{file_name}.csv', 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(header) 
-                nr=[str(v) for v in obj]   
-                writer.writerow(nr)        
-
+                writer.writerow(header)
+                nr = [str(v) for v in obj]
+                writer.writerow(nr)

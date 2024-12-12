@@ -1,8 +1,8 @@
 # BBMRI Federated Platform Converter 
 
-This project contains a tool to help source with data of samples in converting them in formats compatible
-with the BBMRI Federated Platform. In particular, it can convert data into FHIR Resources for the 
-[BBMRI Sample Locator](https://samply.github.io/bbmri-fhir-ig/overview.html) and in OMOP for the BCPlatform. 
+This project contains a tool to help developers in converting data about samples read from a data source into formats compatible
+with the [BBMRI Federated Platform](https://www.bbmri-eric.eu/federated-platform/). In particular, it can convert data into FHIR Resources for the 
+[BBMRI Sample Locator](https://locator.bbmri-eric.eu/) and in OMOP for the [BBMRI Finder](https://finder.bbmri-eric.eu/). 
 
 The utility implements an internal data model compatible with [MIABIS](https://github.com/BBMRI-ERIC/miabis).
 
@@ -14,10 +14,6 @@ A schema of the ETL process using the tool is the following
 ![ETL PROCESS](images/etl_process.png)
 
 An example of a class implementing a source from a mock dataset can be found in `examples` directory.
-
-## Acknowledgments
-
-This work has been partially supported by the European Joint Programme on Rare Disease (grant agreement N. 825575) and
 
 ## Dependencies
 
@@ -57,3 +53,13 @@ destination = FHIRDest(JsonFile(output_dir))
 c = Converter(source, destination, Converter.CASE)
 c.run()
 ```
+
+## License 
+
+This project is licensed under the terms of the GNU General Public License v3.0 (GNU GPLv3). See the [LICENSE](LICENSE) for details
+
+## Acknowledgments
+
+This work has been partially supported by the following sources:
+ * The [European Joint Programme on Rare Disease (EJPRD)](https://www.ejprarediseases.org/) project (grant agreement N. 825575)
+ * The [EOSC-Life](https://www.eosc-life.eu/) European project (grant agreement N. 824087), within the EOSC-Life WP1 Demonstrator “Cloudification of BBMRI-ERIC CRC-Cohort and its Digital Pathology Imaging” (APPID 1228).
