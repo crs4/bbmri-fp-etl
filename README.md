@@ -9,7 +9,9 @@ The utility implements an internal data model compatible with [MIABIS](https://g
 To convert data from a new source, a new class extending `AbstractSource` should be implemented to create the MIABIS
 classes that can be then converted and serialized for the needed Federated Platform solution.
 
-The converter
+A schema of the ETL process using the tool is the following
+
+![ETL PROCESS](images/etl_process.png)
 
 An example of a class implementing a source from a mock dataset can be found in `examples` directory.
 
