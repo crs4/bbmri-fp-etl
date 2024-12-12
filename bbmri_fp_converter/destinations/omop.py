@@ -1,7 +1,8 @@
 import datetime
-import re
+from typing import List
+from collections import OrderedDict
 
-from bbmri_fp_converter.models import Sex, DiseaseOntology, SampleType, EventType
+from bbmri_fp_converter.models import Sex, DiseaseOntology, SampleType, EventType, Sample
 
 # Aggregate, RoleType, Biobank, DataCategory, CollectionType, Sex, \
 #    Collection, AgeUnit, DiseaseOntology, SamplingEvent, SampleType
@@ -140,363 +141,142 @@ class OMOPDest:
         self._observation_period_cols = ['observation_period_id', 'person_id', 'observation_period_start_date',
                                          'observation_period_end_date', 'period_type_concept_id']
 
-    def _create_person_entry(self, donor):
-        pe = [donor.id, GENDER_MAP[donor.gender][1]]
+    @staticmethod
+    def _create_person_entry(donor):
+        return OrderedDict({
+            'person_id': donor.id,
+            'gender_concept_id': GENDER_MAP[donor.gender][1],
+            'year_of_birth': donor.birth_date.year if donor.birth_date is not None else '',
+            'month_of_birth': donor.birth_date.month if donor.birth_date is not None else '',
+            'day_of_birth': donor.birth_date.day if donor.birth_date is not None else '',
+            'birth_datetime': donor.birth_date.isoformat() if donor.birth_date is not None else '',
+            'race_concept_id': 0,
+            'ethnicity_concept_id': GENDER_MAP[donor.gender][0],
+            'location_id': '',
+            'provider_id': '',
+            'care_site_id': '',
+            'person_source_value': donor.id_source,
+            'gender_source_value': GENDER_MAP[donor.gender][0],
+            'gender_source_concept_id': GENDER_MAP[donor.gender][1],
+            'race_source_value': '',
+            'race_source_concept_id': 0,
+            'ethnicity_source_value': '',
+            'ethnicity_source_concept_id': 0
+        })
 
-        if donor.birth_date is not None:
-            birthdate = donor.birth_date.isoformat()
-            bd = re.split('T|-', birthdate)
-            year_of_birth = int(bd[0])
-            month_of_birth = int(bd[1]) if len(bd) > 1 else ''
-            day_of_birth = int(bd[2]) if len(bd) > 2 else ''
-            bdatetime = birthdate
-        else:
-            year_of_birth = ''
-            month_of_birth = ''
-            day_of_birth = ''
-            bdatetime = ''
-
-        pe.extend([year_of_birth, month_of_birth, day_of_birth, bdatetime])
-        race_concept_id = 0
-        ethnicity_concept_id = ''
-        location_id = ''
-        provider_id = ''
-        care_site_id = ''
-        person_source_value = donor.id_source
-        gender_source_value = GENDER_MAP[donor.gender][0]
-        gender_source_concept_id = GENDER_MAP[donor.gender][1]
-        race_source_value = ''
-        race_source_concept_id = 0
-        ethnicity_source_value = ''
-        ethnicity_source_concept_id = 0
-        pe.extend([race_concept_id, ethnicity_concept_id, location_id,
-                   provider_id, care_site_id, person_source_value,
-                   gender_source_value, gender_source_concept_id,
-                   race_source_value, race_source_concept_id,
-                   ethnicity_source_value, ethnicity_source_concept_id])
-
-        return pe
-
-    def _create_condition_occurrence_entry(self, donor, pe):
-        co = []
-
+    @staticmethod
+    def _process_events(donor):
+        conditions = []
+        procedures = []
         if donor.events is not None:
-
             for event in donor.events:
-                if event.age_at_event is not None:
-                    if event.event_type == EventType.DIAGNOSIS:
-                        condition_start_datetime = ''
-                        # sum birthday year and age at event to find date
-                        if pe[2] != '':
-                            by = int(pe[2])
-                            m = 1
-                            if event.age_at_event_unit == 'month':
-                                m = 1 / 12.
-                            year = pe[2] + m * event.age_at_event
-                            d = datetime.date(year, 1, 1)
-                        else:
-                            # I know age at event but not birthday
-                            # set datetime as age_at_event
-                            if event.age_at_event_unit == 'month':
-                                m = 1 / 12.
-                            year = m * event.age_at_event
-                            d = datetime.date(year, 1, 1)
-                        if event.date_at_event is not None:
-                            d = event.date_at_event
-                        else:
-                            d = datetime.date(1, 1, 1)
-                        condition_occurrence_id = event.id
-                        person_id = donor.id
-                        if event.disease is not None:
-                            condition_concept_id = event.disease.code
-                            condition_source_value = event.disease.description
-                            condition_source_concept_id = event.disease.code
-                        else:
-                            condition_concept_id = ''
-                            condition_source_value = ''
-                            condition_source_concept_id = ''
-                        condition_start_date = d.isoformat()
-                        condition_start_datetime = d
-                        condition_end_date = ''
-                        condition_end_datetime = ''
-                        condition_type_concept_id = ''
-                        if event.provenance is not None:
-                            condition_status_source_value = event.provenance.description
-                            condition_status_concept_id = event.provenance.code
-                        else:
-                            condition_status_source_value = ''
-                            condition_status_concept_id = ''
-                        stop_reason = ''
-                        provider_id = ''
-                        visit_occurrence_id = ''
-                        visit_detail_id = ''
+                # TODO add calculation of condition_start_date from age_at_event
+                if event.event_type == EventType.DIAGNOSIS:
+                    conditions.append(OrderedDict({
+                        'condition_occurrence_id': event.id,
+                        'person_id': donor.id,
+                        'condition_concept_id': event.disease.code if event.disease is not None else '',
+                        'condition_source_value': event.disease.description if event.disease is not None else '',
+                        'condition_source_concept_id': event.disease.code if event.disease is not None else '',
+                        'condition_start_date': event.date_at_event.isoformat() if event.date_at_event else '0001-01-01',
+                        'condition_start_datetime': event.date_at_event.isoformat() if event.date_at_event else datetime.date(
+                            1, 1, 1),
+                        'condition_end_date': '',
+                        'condition_end_datetime': '',
+                        'condition_type_concept_id': '',
+                        'stop_reason': '',
+                        'provider_id': '',
+                        'visit_occurrence_id': '',
+                        'visit_detail_id': '',
+                        'condition_status_concept_id': event.provenance.code if event.provenance is not None else '',
+                        'condition_status_source_value': event.provenance.description if event.provenance is not None else ''
+                    }))
+                else:
+                    procedures.append(OrderedDict({
+                        'procedure_occurrence_id': event.id,
+                        'person_id': donor.id,
+                        'procedure_concept_id': PROCEDURE_MAP[event.event_type][1],
+                        'procedure_date': event.date_at_event.isoformat() if event.date_at_event else '0001-01-01',
+                        'procedure_datetime': event.date_at_event if event.date_at_event else datetime.date(1, 1, 1),
+                        'procedure_end_date': '',
+                        'procedure_end_datetime': '',
+                        'procedure_type_concept_id': '',
+                        'modifier_concept_id': '',
+                        'quantity': '',
+                        'provider_id': '',
+                        'visit_occurrence_id': '',
+                        'visit_detail_id': '',
+                        'procedure_source_value': PROCEDURE_MAP[event.event_type][0],
+                        'procedure_source_concept_id': PROCEDURE_MAP[event.event_type][1],
+                        'modifier_source_value': '',
+                    }))
+        return conditions, procedures
 
-                        co.extend([condition_occurrence_id, person_id, condition_concept_id,
-                                   condition_start_date, condition_start_datetime, condition_end_date,
-                                   condition_end_datetime, condition_type_concept_id,
-                                   condition_status_concept_id, stop_reason, provider_id,
-                                   visit_occurrence_id, visit_detail_id, condition_source_value,
-                                   condition_source_concept_id, condition_status_source_value])
-
-        return [co, condition_status_concept_id]
-
-    def _create_procedure_occurrence_entry(self, donor, pe):
-        po = []
-
-        if donor.events is not None:
-
-            for event in donor.events:
-                if event.age_at_event is not None and event.event_type != EventType.DIAGNOSIS:
-                    procedure_start_datetime = ''
-                    # sum birthday year and age at event to find date
-                    if pe[2] != '':
-                        m = 1
-                        if event.age_at_event_unit == 'month':
-                            m = 1 / 12.
-                        year = pe[2] + m * event.age_at_event
-                        d = datetime.date(year, 1, 1)
-                    else:
-                        # I know age at event but not birthday
-                        # set datetime as age_at_event
-                        if event.age_at_event_unit == 'month':
-                            m = 1 / 12.
-                        year = m * event.age_at_event
-                        d = datetime.date(year, 1, 1)
-                    if event.date_at_event is not None:
-                        d = event.date_at_event
-                    else:
-                        d = datetime.date(1, 1, 1)
-                    procedure_occurrence_id = event.id
-                    person_id = donor.id
-                    mappedprocedure = PROCEDURE_MAP[event.event_type]
-                    procedure_concept_id = mappedprocedure[1]
-                    procedure_source_value = mappedprocedure[0]
-                    procedure_source_concept_id = mappedprocedure[1]
-                    procedure_date = d.isoformat()
-                    procedure_datetime = d
-                    procedure_end_date = ''
-                    procedure_end_datetime = ''
-                    procedure_type_concept_id = ''
-                    modifier_concept_id = ''
-                    quantity = ''
-                    provider_id = ''
-                    visit_occurrence_id = ''
-                    visit_detail_id = ''
-                    modifier_source_value = ''
-                    po.append([procedure_occurrence_id, person_id, procedure_concept_id,
-                               procedure_date, procedure_datetime, procedure_end_date,
-                               procedure_end_datetime, procedure_type_concept_id,
-                               modifier_concept_id, quantity, provider_id,
-                               visit_occurrence_id, visit_detail_id, procedure_source_value,
-                               procedure_source_concept_id, modifier_source_value])
-
-        return po
-
-    def _create_specimen_entry(self, donor, samples):
-        sa = []
+    @staticmethod
+    def _create_specimen_entries(donor, samples_data: List[Sample]):
+        samples = []
         first_sample_acquisition = None
-        if samples is not None:
-            for sample in samples:
-                specimen_id = sample.id
-                person_id = donor.id
-                specimen_concept_id = SPECIMEN_TYPE_MAP[sample.type][2]
-                # OMOP4822448 581378 EHR Detail
-                specimen_type_concept_id = 581378
-                specimen_date = sample.creation_time.strftime("%Y-%m-%d")
-                specimen_datetime = sample.creation_time
+        if samples_data is not None:
+            for sample in samples_data:
+                specimen_date = sample.creation_time.isoformat() if sample.creation_time is not None else ''
+                specimen_datetime = sample.creation_time.isoformat() if sample.creation_time is not None else ''
+
                 if first_sample_acquisition is None or first_sample_acquisition < specimen_date:
                     first_sample_acquisition = specimen_date
-                quantity = ''
-                unit_concept_id = ''
-                anatomic_site_concept_id = ''
-                anatomic_site_source_value = ''
-                # if SNOMED is used
-                if sample.anatomical_site is not None:
-                    anatomic_site_concept_id = sample.anatomical_site.code
-                    anatomic_site_source_value = sample.anatomical_site.description
 
                 disease_status_concept_id = ''
                 disease_status_source_value = ''
                 if sample.content_diagnosis is not None:
                     for cd in sample.content_diagnosis:
-                        if cd.ontology == DiseaseOntology.ORPHANET:
-                            dc = self._get_SNOMED_codes(cd.code)
-                            disease_status_concept_id = dc[0]
-                            disease_status_source_value = dc[1]
-                        elif cd.ontology == 'SNOMED':
+                        if cd.ontology == DiseaseOntology.SNOMED:
                             disease_status_concept_id = cd.code
                             disease_status_source_value = cd.description
+                            break
 
-                specimen_source_id = sample.id
-                specimen_source_value = ''
-                unit_source_value = ''
-                # anatomic_site_source_value=''
-                if sample.anatomical_site is not None:
-                    anatomic_site_source_value = sample.anatomical_site.code
+                # TODO: can we handle multiple diseases? Currently seems not
+                samples.append(OrderedDict({
+                    'specimen_id': sample.id,
+                    'person_id': donor.id,
+                    'specimen_concept_id': SPECIMEN_TYPE_MAP[sample.type][2],
+                    'specimen_type_concept_id': 581378,  # OMOP 4822448 581378 EHR Detail
+                    'specimen_date': specimen_date,
+                    'specimen_datetime': specimen_datetime,
+                    'quantity': '',
+                    'unit_concept_id': '',
+                    'anatomic_site_concept_id': sample.anatomical_site.code if sample.anatomical_site else '',
+                    'anatomic_site_source_value': sample.anatomical_site.description if sample.anatomical_site else '',
+                    'disease_status_concept_id': disease_status_concept_id,
+                    'disease_status_source_value': disease_status_source_value,
+                    'specimen_source_id': sample.id,
+                    'specimen_source_value': '',
+                    'unit_source_value': '',
+                }))
 
-                sa.append([specimen_id, person_id, specimen_concept_id, specimen_type_concept_id, specimen_date,
-                           specimen_datetime, quantity, unit_concept_id, anatomic_site_concept_id,
-                           disease_status_concept_id, specimen_source_id, specimen_source_value, unit_source_value,
-                           anatomic_site_source_value, disease_status_source_value])
-
-        return [sa, first_sample_acquisition]
-
-    def _create_observation_period_entry(self, donor, first_sample_acquisition, condition_status_concept_id):
-
-        # observation_period_id coincide with donor.id (one per donor)
-        op = []
-        observation_period_id = donor.id
-        person_id = donor.id
-        observation_period_start_date = first_sample_acquisition
-        observation_period_end_date = donor.last_update
-        period_type_concept_id = condition_status_concept_id
-        op.extend([observation_period_id, person_id, observation_period_start_date, observation_period_end_date,
-                   period_type_concept_id])
-
-        return op
-
-    def _get_SNOMED_codes(self, disease_data):
-        pass
-        # snomed_codes = self.orphacodes.orphaToSNOMED(disease_data.code.split('_')[1])
-        # if snomed_codes is not None:
-        #     return [{
-        #         'system': DiseaseOntology.ICD_10,
-        #         'code': code['code']
-        #     } for code in snomed_codes if code['mapping_type'] in ('E', 'BTNT')]
-        # else:
-        #     return []
+        return samples, first_sample_acquisition
 
     @staticmethod
-    def _transform_resource_id(id_):
-        transformation = {
-            "/": "-",
-            "_": "-",
-            "(": "",
-            ")": "",
-            ' ': '-',
-            '+': '',
-            ':': '-'
-        }
-        return id_.translate(str.maketrans(transformation))
+    def _create_observation_period_entry(donor, first_sample_acquisition, condition_status_concept_id):
+        return OrderedDict({
+            'observation_period_id': donor.id,
+            'person_id': donor.id,
+            'observation_period_start_date': first_sample_acquisition,
+            'observation_period_end_date': donor.last_update,
+            'period_type_concept_id': condition_status_concept_id
+        })
 
     def create_participant(self, record):
+        person = self._create_person_entry(record.donor)
+        conditions, procedures = self._process_events(record.donor)
+        samples, first_sample_acquisition = self._create_specimen_entries(record.donor, record.samples)
+        observation_period = self._create_observation_period_entry(record.donor, first_sample_acquisition, '')
 
-        pe = self._create_person_entry(record.donor)
-
-        [co, observation_concept_id] = self._create_condition_occurrence_entry(record.donor, pe)
-
-        po = self._create_procedure_occurrence_entry(record.donor, pe)
-
-        [se, first_sample_acquisition] = self._create_specimen_entry(record.donor, record.samples)
-
-        op = self._create_observation_period_entry(record.donor, first_sample_acquisition, observation_concept_id)
-
-        self.save('person', self._person_cols, pe)
-        self.save('condition_occurrence', self._condition_cols, co)
-        self.save('observation_period', self._observation_period_cols, op)
-        for spec in se:
-            self.save('specimen', self._specimen_cols, spec)
-        for proc in po:
-            self.save('procedure_occurrence', self._procedure_cols, proc)
-
-    # def create_organizations(self, record: Aggregate):
-    #     b = Bundle()
-    #     b.type = 'transaction'
-    #     b.entry = []
-
-    #     resource = Organization()
-    #     resource.id = self._transform_resource_id(record.id)
-    #     resource.identifier = [Identifier({
-    #         'system': BBMRI_ERIC_IDENTIFIER_SYSTEM,
-    #         'value': record.id
-    #     })]
-    #     resource.name = record.name
-    #     resource.acronym = record.acronym
-    #     resource.extension = [Extension({
-    #         'url': DESCRIPTION_EXTENSION,
-    #         'valueString': record.description
-    #     })]
-    #     resource.telecom = [ContactPoint({
-    #         'system': 'url',
-    #         'value': t
-    #     }) for t in record.url] if record.url is not None else None
-    #     contacts = []
-    #     for c in record.contact:
-    #         contact = OrganizationContact()
-    #         if c.role.type == RoleType.HEAD and c.role.description is not None:
-    #             contact.extension = [Extension({
-    #                 'url': CONTACT_ROLE_EXTENSION,
-    #                 'valueString': c.role.description
-    #             })]
-    #         contact.purpose = CodeableConcept({
-    #             'coding': [{
-    #                 'system': CONTACT_POINT_PURPOSE,
-    #                 'code': CONTACT_POINT_PURPOSE_ADMIN if c.role.type == RoleType.HEAD else CONTACT_POINT_PURPOSE_RESEARCH
-    #             }]
-    #         })
-    #         contact.name = HumanName({
-    #             'given': [c.name.given] if c.name is not None else None,
-    #             'family': c.name.family if c.name is not None else None,
-    #             'prefix': c.name.prefix if c.name is not None else None,
-    #             'suffix': c.name.suffix if c.name is not None else None
-    #         })
-    #         contact.telecom = [ContactPoint({
-    #             'system': t.type.value,
-    #             'value': t.value
-    #         }) for t in c.telecom]
-    #         contacts.append(contact)
-    #     resource.contact = contacts
-
-    #     if isinstance(record, Biobank):
-    #         resource.type = [CodeableConcept({
-    #             'coding': [{
-    #                 'code': 'Biobank'
-    #             }]
-    #         })]
-    #         resource.meta = Meta({
-    #             'profile': [BIOBANK_PROFILE]
-    #         })
-    #     elif isinstance(record, Collection):
-    #         resource.type = [CodeableConcept({
-    #             'coding': [{
-    #                 'code': 'Collection'
-    #             }]
-    #         })]
-    #         resource.meta = Meta({
-    #             'profile': [COLLECTION_PROFILE]
-    #         })
-    #         resource.extension.extend(Extension({
-    #             'url': COLLECTION_TYPE_EXTENSION,
-    #             'valueCodeableConcept': {
-    #                 'coding': [{
-    #                     'system': COLLECTION_TYPE_CODE_SYSTEM,
-    #                     'code': COLLECTION_TYPE_MAP[t][0],
-    #                     'display': COLLECTION_TYPE_MAP[t][1]
-    #                 }]
-    #             }
-    #         }) for t in record.type)
-
-    #         resource.extension.extend(Extension({
-    #             'url': DATA_CATEGORY_EXTENSION,
-    #             'valueCodeableConcept': {
-    #                 'coding': [{
-    #                     'system': DATA_CATEGORY_CODE_SYSTEM,
-    #                     'code': DATA_CATEGORY_MAP[c][0],
-    #                     'display': DATA_CATEGORY_MAP[c][1]
-    #                 }]
-    #             }
-    #         }) for c in record.data_category)
-    #         resource.partOf = FHIRReference(
-    #             {'reference': f'Organization/{self._transform_resource_id(record.biobank.id)}'})
-
-    #     entry = BundleEntry()
-    #     entry.resource = resource
-    #     entry.request = BundleEntryRequest({
-    #         'method': 'PUT',
-    #         'url': f'Organization/{resource.id}'
-    #     })
-    #     b.entry.append(entry)
-    #     self.save(resource.id, b.as_json())
+        self.save('person', list(person.keys()), [person])
+        self.save('observation_period', list(observation_period.keys()), [observation_period])
+        self.save('specimen', list(samples[0].keys()), samples)
+        if len(conditions) > 0:
+            self.save('condition_occurrence', list(conditions[0].keys()), conditions)
+        if len(procedures) > 0:
+            self.save('procedure_occurrence', list(procedures[0].keys()), procedures)
 
     def save(self, file_name, header, csvdata):
         self.output.serialize(file_name, header, csvdata)

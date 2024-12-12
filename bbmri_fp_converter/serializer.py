@@ -1,6 +1,5 @@
 import csv
 import json
-import os
 
 
 class BaseOutput:
@@ -23,15 +22,8 @@ class CSVFile(BaseOutput):
     def __init__(self, directory):
         self.output_dir = directory
 
-    def serialize(self, file_name, header, obj):
-        if os.path.isfile(f'{self.output_dir}/{file_name}.csv'):
-            with open(f'{self.output_dir}/{file_name}.csv', 'a', newline='') as f:
-                writer = csv.writer(f)
-                nr = [str(v) for v in obj]
-                writer.writerow(nr)
-        else:
-            with open(f'{self.output_dir}/{file_name}.csv', 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(header)
-                nr = [str(v) for v in obj]
-                writer.writerow(nr)
+    def serialize(self, file_name, header, rows):
+        with open(f'{self.output_dir}/{file_name}.csv', 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
+            writer.writerows(rows)

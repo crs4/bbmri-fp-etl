@@ -51,6 +51,9 @@ SPECIMENS_MAPPING = {
     "erythrocyte": SampleType.RED_BLOOD_CELLS
 }
 
+EVENTS = [{
+    "type": "diagnosis",
+}]
 
 class ExampleSource(AbstractSource):
     """
