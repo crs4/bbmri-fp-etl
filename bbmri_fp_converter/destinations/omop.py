@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from bbmri_fp_etl.models import Sex, DiseaseOntology, SampleType, EventType
+from bbmri_fp_converter.models import Sex, DiseaseOntology, SampleType, EventType
 
 # Aggregate, RoleType, Biobank, DataCategory, CollectionType, Sex, \
 #    Collection, AgeUnit, DiseaseOntology, SamplingEvent, SampleType

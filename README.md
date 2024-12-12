@@ -1,17 +1,25 @@
-# BBMRI Federated Platform ETL 
+# BBMRI Federated Platform Converter 
 
 This project contains a tool to help source with data of samples in converting them in formats compatible
 with the BBMRI Federated Platform. In particular, it can convert data into FHIR Resources for the 
 [BBMRI Sample Locator](https://samply.github.io/bbmri-fhir-ig/overview.html) and in OMOP for the BCPlatform. 
 
-The utility implements an internal data model compatible with [MIABIS](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7310316/).
+The utility implements an internal data model compatible with [MIABIS](https://github.com/BBMRI-ERIC/miabis).
 
-To convert data from a new source, a new class extending `AbstractSource` should be implemented.
+To convert data from a new source, a new class extending `AbstractSource` should be implemented to create the MIABIS
+classes that can be then converted and serialized for the needed Federated Platform solution.
+
+The converter
+
 An example of a class implementing a source from a mock dataset can be found in `examples` directory.
+
+## Acknowledgments
+
+This work has been partially supported by the European Joint Programme on Rare Disease (grant agreement N. 825575) and
 
 ## Dependencies
 
-To use the script Python 3.10 and [Poetry](https://python-poetry.org/) are needed. All other python dependencies will 
+To use the tool Python 3.12 and [Poetry](https://python-poetry.org/) are needed. All other python dependencies will 
 be installed using poetry
 
 ### Install dependencies

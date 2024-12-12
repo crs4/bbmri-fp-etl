@@ -35,18 +35,3 @@ class CSVFile(BaseOutput):
                 nr=[str(v) for v in obj]   
                 writer.writerow(nr)        
 
-
-
-        # try:
-        #     with open(f'{self.output_dir}/{file_name}.csv', 'a',newline='') as f:
-        #         writer = csv.writer(f)
-        #         for oline in obj:
-        #             writer.writerow(oline)
-
-        # except FileNotFoundError:
-        #      with open(f'{self.output_dir}/{file_name}.csv', 'w',newline='') as f:
-        #         writer = csv.writer(f)
-        #         writer.writerow(header)    
-        #         for oline in obj:
-        #             writer.writerow(oline)
-            
