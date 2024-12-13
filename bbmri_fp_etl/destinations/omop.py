@@ -2,7 +2,7 @@ import datetime
 from typing import List
 from collections import OrderedDict
 
-from bbmri_fp_converter.models import Sex, DiseaseOntology, SampleType, EventType, Sample
+from bbmri_fp_etl.models import Sex, DiseaseOntology, SampleType, EventType, Sample
 
 # Aggregate, RoleType, Biobank, DataCategory, CollectionType, Sex, \
 #    Collection, AgeUnit, DiseaseOntology, SamplingEvent, SampleType

@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger('bbmri_fp_converter')
+logger = logging.getLogger('bbmri_fp_etl')
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 console_handler = logging.StreamHandler()

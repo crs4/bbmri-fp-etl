@@ -12,9 +12,9 @@ from fhirclient.models.organization import Organization, OrganizationContact
 from fhirclient.models.patient import Patient
 from fhirclient.models.specimen import Specimen, SpecimenCollection
 
-from bbmri_fp_converter.destinations import transform_id
-from bbmri_fp_converter.destinations.resources import Condition
-from bbmri_fp_converter.models import Aggregate, RoleType, Biobank, DataCategory, CollectionType, Sex, \
+from bbmri_fp_etl.destinations import transform_id
+from bbmri_fp_etl.destinations.resources import Condition
+from bbmri_fp_etl.models import Aggregate, RoleType, Biobank, DataCategory, CollectionType, Sex, \
     Collection, AgeUnit, DiseaseOntology, SamplingEvent, SampleType
 
 PATIENT_PROFILE = 'https://fhir.bbmri.de/StructureDefinition/Patient'

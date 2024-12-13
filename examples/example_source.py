@@ -2,12 +2,12 @@ import os
 from collections import namedtuple
 from datetime import datetime, date
 
-from bbmri_fp_converter.converter import Converter
-from bbmri_fp_converter.destinations.fhir import FHIRDest
-from bbmri_fp_converter.destinations.omop import OMOPDest
-from bbmri_fp_converter.models import Donor, Sex, Case, SampleType, SamplingEvent, Sample, Collection
-from bbmri_fp_converter.serializer import JsonFile, CSVFile
-from bbmri_fp_converter.sources import AbstractSource
+from bbmri_fp_etl.converter import Converter
+from bbmri_fp_etl.destinations.fhir import FHIRDest
+from bbmri_fp_etl.destinations.omop import OMOPDest
+from bbmri_fp_etl.models import Donor, Sex, Case, SampleType, SamplingEvent, Sample, Collection
+from bbmri_fp_etl.serializer import JsonFile, CSVFile
+from bbmri_fp_etl.sources import AbstractSource
 
 # simulating a situation where there is one collection of samples
 COLLECTION_ID = "sample_collection:1"
