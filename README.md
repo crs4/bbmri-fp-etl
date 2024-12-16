@@ -56,7 +56,7 @@ c.run()
 
 ## License 
 
-This project is licensed under the terms of the GNU General Public License v3.0 (GNU GPLv3). See the [LICENSE](LICENSE) for details
+This project is licensed under the terms of the GNU Affero General Public License v3.0 (GNU AGPLv3). See the [COPYING](COPYING) for details
 
 ## Acknowledgments
 
