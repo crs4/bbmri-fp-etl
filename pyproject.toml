@@ -1,7 +1,11 @@
 [tool.poetry]
 name = "bbmri-fp-etl"
 version = "0.1.0"
-description = ""
+description = """
+A framework to support the implementation of tools to read and convert data
+about biomedical samples into formats compatible with the BBMRI Federated
+Platform (i.e., FHIR Resources and OMOP).
+"""
 authors = [
     "Vittorio Meloni <vittorio.meloni@crs4.it>",
     "Alessandro Sulis <alessandro.sulis@crs4.it>",
