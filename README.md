@@ -74,4 +74,5 @@ License v3.0 (GNU AGPLv3)](https://www.gnu.org/licenses/agpl-3.0.en.html). See t
 
 This work has been partially funded by the following sources:
 * The [European Joint Programme on Rare Disease (EJPRD)](https://www.ejprarediseases.org/) project (grant agreement N. 825575);
-* The [EOSC-Life](https://www.eosc-life.eu/) European project (grant agreement N. 824087), within the EOSC-Life WP1 Demonstrator “Cloudification of BBMRI-ERIC CRC-Cohort and its Digital Pathology Imaging” (APPID 1228).
+* The [EOSC-Life](https://www.eosc-life.eu/) European project (grant agreement N. 824087), within the EOSC-Life WP1 Demonstrator “Cloudification of BBMRI-ERIC CRC-Cohort and its Digital Pathology Imaging” (APPID 1228);
+* The Total Patient Management project (grant agreement RC_CRP_077)
