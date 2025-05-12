@@ -18,6 +18,7 @@
 import os
 from collections import namedtuple
 from datetime import datetime, date
+from typing import Iterable
 
 from bbmri_fp_etl.converter import Converter
 from bbmri_fp_etl.destinations.fhir import FHIRDest
@@ -82,7 +83,10 @@ class ExampleSource(AbstractSource):
     It is not intended to be computationally efficient
     """
 
-    def get_cases_data(self):
+    def get_biobanks_data(self):
+        raise NotImplementedError()
+
+    def get_cases_data(self) -> Iterable[Case]:
         cases = []
         for p in PATIENTS:
             donor = Donor(
