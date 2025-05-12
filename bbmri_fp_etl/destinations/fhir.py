@@ -377,30 +377,31 @@ class FHIRDest:
             'value': t
         }) for t in record.url] if record.url is not None else None
         contacts = []
-        for c in record.contact:
-            contact = OrganizationContact()
-            if c.role.type == RoleType.HEAD and c.role.description is not None:
-                contact.extension = [Extension({
-                    'url': CONTACT_ROLE_EXTENSION,
-                    'valueString': c.role.description
-                })]
-            contact.purpose = CodeableConcept({
-                'coding': [{
-                    'system': CONTACT_POINT_PURPOSE,
-                    'code': CONTACT_POINT_PURPOSE_ADMIN if c.role.type == RoleType.HEAD else CONTACT_POINT_PURPOSE_RESEARCH
-                }]
-            })
-            contact.name = HumanName({
-                'given': [c.name.given] if c.name is not None else None,
-                'family': c.name.family if c.name is not None else None,
-                'prefix': c.name.prefix if c.name is not None else None,
-                'suffix': c.name.suffix if c.name is not None else None
-            })
-            contact.telecom = [ContactPoint({
-                'system': t.type.value,
-                'value': t.value
-            }) for t in c.telecom]
-            contacts.append(contact)
+        if record.contact:
+            for c in record.contact:
+                contact = OrganizationContact()
+                if c.role.type == RoleType.HEAD and c.role.description is not None:
+                    contact.extension = [Extension({
+                        'url': CONTACT_ROLE_EXTENSION,
+                        'valueString': c.role.description
+                    })]
+                contact.purpose = CodeableConcept({
+                    'coding': [{
+                        'system': CONTACT_POINT_PURPOSE,
+                        'code': CONTACT_POINT_PURPOSE_ADMIN if c.role.type == RoleType.HEAD else CONTACT_POINT_PURPOSE_RESEARCH
+                    }]
+                })
+                contact.name = HumanName({
+                    'given': [c.name.given] if c.name is not None else None,
+                    'family': c.name.family if c.name is not None else None,
+                    'prefix': c.name.prefix if c.name is not None else None,
+                    'suffix': c.name.suffix if c.name is not None else None
+                })
+                contact.telecom = [ContactPoint({
+                    'system': t.type.value,
+                    'value': t.value
+                }) for t in c.telecom]
+                contacts.append(contact)
         resource.contact = contacts
 
         if isinstance(record, Biobank):
