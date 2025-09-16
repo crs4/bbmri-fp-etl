@@ -4,7 +4,7 @@ version = "0.1.0"
 description = """
 A framework to support the implementation of tools to read and convert data
 about biomedical samples into formats compatible with the BBMRI Federated
-Platform (i.e., FHIR Resources and OMOP).
+Platform.
 """
 authors = [
     "Vittorio Meloni <vittorio.meloni@crs4.it>",
