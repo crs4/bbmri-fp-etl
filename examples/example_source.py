@@ -23,7 +23,7 @@ from typing import Iterable
 from bbmri_fp_etl.converter import Converter
 from bbmri_fp_etl.destinations.fhir import FHIRDest
 from bbmri_fp_etl.destinations.omop import OMOPDest
-from bbmri_fp_etl.models import Donor, Sex, Case, SampleType, SamplingEvent, Sample, Collection
+from bbmri_fp_etl.models import Donor, Sex, Case, SampleType, SamplingEvent, Sample, Collection, StorageTemperature
 from bbmri_fp_etl.serializer import JsonFile, CSVFile
 from bbmri_fp_etl.sources import AbstractSource
 
@@ -31,7 +31,7 @@ from bbmri_fp_etl.sources import AbstractSource
 COLLECTION_ID = "sample_collection:1"
 
 Patient = namedtuple('Patient', ['id', 'name', 'surname', 'sex', 'date_of_birth'])
-Specimen = namedtuple('Specimen', ['id', 'patient_id', 'type', 'withdrawn', 'condition'])
+Specimen = namedtuple('Specimen', ['id', 'patient_id', 'type', 'withdrawn', 'condition', 'storage_temp'])
 Event = namedtuple('Event', ['id', 'patient_id', 'type'])
 
 PATIENTS = [
@@ -42,17 +42,17 @@ PATIENTS = [
 ]
 
 SPECIMENS = [
-    Specimen("pid:1:specimen:1", "pid:1", "dna", "2010-10-19", "frozen"),
-    Specimen("pid:1:specimen:2", "pid:1", "blood", "2010-10-19", "frozen"),
-    Specimen("pid:1:specimen:3", "pid:1", "buffy-coated", "2010-10-19", "frozen"),
-    Specimen("pid:2:specimen:1", "pid:2", "plasma", "2023-05-13", "ffpe"),
-    Specimen("pid:2:specimen:1", "pid:2", "serum", "2023-05-13", "frozen"),
-    Specimen("pid:3:specimen:1", "pid:3", "ascites", "1998-03-15", "ffpe"),
-    Specimen("pid:4:specimen:1", "pid:4", "faeces", "2005-07-23", "frozen"),
-    Specimen("pid:4:specimen:2", "pid:4", "urine", "2005-07-23", "ffpe"),
-    Specimen("pid:4:specimen:3", "pid:4", "saliva", "2005-07-23", "ffpe"),
-    Specimen("pid:4:specimen:4", "pid:4", "leucocyte", "2005-07-23", "ffpe"),
-    Specimen("pid:4:specimen:5", "pid:4", "erythrocyte", "2005-07-23", "ffpe"),
+    Specimen("pid:1:specimen:1", "pid:1", "dna", "2010-10-19", "frozen", "25"),
+    Specimen("pid:1:specimen:2", "pid:1", "blood", "2010-10-19", "frozen", "20"),
+    Specimen("pid:1:specimen:3", "pid:1", "buffy-coated", "2010-10-19", "frozen", "70"),
+    Specimen("pid:2:specimen:1", "pid:2", "plasma", "2023-05-13", "ffpe", None),
+    Specimen("pid:2:specimen:1", "pid:2", "serum", "2023-05-13", "frozen", "Gaseous Nitro"),
+    Specimen("pid:3:specimen:1", "pid:3", "ascites", "1998-03-15", "ffpe", None),
+    Specimen("pid:4:specimen:1", "pid:4", "faeces", "2005-07-23", "frozen", "Liquid Nitro"),
+    Specimen("pid:4:specimen:2", "pid:4", "urine", "2005-07-23", "ffpe", None),
+    Specimen("pid:4:specimen:3", "pid:4", "saliva", "2005-07-23", "ffpe", None),
+    Specimen("pid:4:specimen:4", "pid:4", "leucocyte", "2005-07-23", "ffpe", None),
+    Specimen("pid:4:specimen:5", "pid:4", "erythrocyte", "2005-07-23", "ffpe", None),
 ]
 
 SPECIMENS_MAPPING = {
@@ -67,6 +67,15 @@ SPECIMENS_MAPPING = {
     "saliva": SampleType.SALIVA,
     "leucocyte": SampleType.PRIMARY_CELLS,
     "erythrocyte": SampleType.RED_BLOOD_CELLS
+}
+
+STORAGE_TEMP_MAPPING = {
+    None: StorageTemperature.OTHER,
+    "20": StorageTemperature.TEMP_18_TO_35,
+    "25": StorageTemperature.TEMP_18_TO_35,
+    "70": StorageTemperature.TEMP_60_TO_85,
+    "Gaseous Nitro": StorageTemperature.GN,
+    "Liquid Nitro": StorageTemperature.LN,
 }
 
 EVENTS = [{
@@ -108,8 +117,10 @@ class ExampleSource(AbstractSource):
                         events=[sampling_event],
                         collection=Collection(
                             id=COLLECTION_ID
-                        )
+                        ),
+                        storage_temperature=[STORAGE_TEMP_MAPPING[s.storage_temp]]
                     ))
+                    
 
             cases.append(Case(
                 donor=donor,

@@ -293,6 +293,7 @@ class StorageTemperature(StrEnum):
     TEMP_18_TO_35 = "temperature-18to-35"
     TEMP_60_TO_85 = "temperature-60to-85"
     TEMP_2_TO_10 = "temperature2to10"
+    GN = "temperatureGN"
     LN = "temperatureLN"
     ROOM = "temperatureRoom"
     OTHER = "temperatureOther"
@@ -433,6 +434,7 @@ class Sample(BaseModel):
     events: List[Event]
     collection: Collection
     anatomical_site: Optional[AnatomicalSiteOntologyCode] = Field(default=None)
+    storage_temperature: Optional[List[StorageTemperature]] = Field(default_factory=list)
 
 
 class StatusOntology(StrEnum):
