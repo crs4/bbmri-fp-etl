@@ -21,6 +21,7 @@ from fhirclient.models.codeableconcept import CodeableConcept
 from fhirclient.models.contactpoint import ContactPoint
 from fhirclient.models.extension import Extension
 from fhirclient.models.fhirdate import FHIRDate
+from fhirclient.models.fhirdatetime import FHIRDateTime
 from fhirclient.models.fhirreference import FHIRReference
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.identifier import Identifier
@@ -251,8 +252,8 @@ class FHIRDest:
                         "value": data.age_at_event,
                     }
                 )
-            elif data.date_at_event:
-                osdt = FHIRDate(data.date_at_event)
+            if data.date_at_event is not None:
+                osdt = FHIRDateTime(data.date_at_event.isoformat())
                 condition.onsetDateTime = osdt
                 condition.recordedDate = osdt
         except TypeError:
@@ -330,6 +331,9 @@ class FHIRDest:
         specimen.type = CodeableConcept({"coding": specimen_types})
 
         disease_extensions = []
+        if data.creation_time is not None:
+            specimen.collection = SpecimenCollection({'collectedDateTime': data.creation_time.strftime('%Y-%m-%d')})
+
         if data.content_diagnosis is not None:
             for disease in data.content_diagnosis:
                 disease_code = {
