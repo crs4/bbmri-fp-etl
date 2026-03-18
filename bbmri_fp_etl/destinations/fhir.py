@@ -24,11 +24,17 @@ from fhirclient.models.fhirdate import FHIRDate
 from fhirclient.models.fhirdatetime import FHIRDateTime
 from fhirclient.models.fhirreference import FHIRReference
 from fhirclient.models.humanname import HumanName
+from fhirclient.models.address import Address
 from fhirclient.models.identifier import Identifier
 from fhirclient.models.meta import Meta
 from fhirclient.models.organization import Organization, OrganizationContact
 from fhirclient.models.patient import Patient
 from fhirclient.models.specimen import Specimen, SpecimenCollection
+from fhirclient.models.consent import Consent as FHIRConsent
+from fhirclient.models.consent import ConsentProvision, ConsentProvisionData
+from fhirclient.models.coding import Coding
+from fhirclient.models.period import Period
+
 
 from bbmri_fp_etl.destinations import transform_id
 from bbmri_fp_etl.destinations.resources import Condition
@@ -45,13 +51,18 @@ from bbmri_fp_etl.models import (
     SamplingEvent,
     SampleType,
     StorageTemperature,
+    Consent,
+    CCE,
+    CCEDecision,
 )
+import json
 
 PATIENT_PROFILE = "https://fhir.bbmri.de/StructureDefinition/Patient"
 CONDITION_PROFILE = "https://fhir.bbmri.de/StructureDefinition/Condition"
 SPECIMEN_PROFILE = "https://fhir.bbmri.de/StructureDefinition/Specimen"
 BIOBANK_PROFILE = "https://fhir.bbmri.de/StructureDefinition/Biobank"
 COLLECTION_PROFILE = "https://fhir.bbmri.de/StructureDefinition/Collection"
+CONSENT_PROFILE = "https://fhir.bbmri.de/StructureDefinition/Consent"
 
 CUSTODIAN_EXTENSION = "https://fhir.bbmri.de/StructureDefinition/Custodian"
 SAMPLE_DIAGNOSIS_EXTENSION = "https://fhir.bbmri.de/StructureDefinition/SampleDiagnosis"
@@ -61,6 +72,7 @@ STORAGE_TEMPERATURE_EXTENSION = (
 DESCRIPTION_EXTENSION = (
     "https://fhir.bbmri.de/StructureDefinition/OrganizationDescription"
 )
+JURIDICAL_PERSON_EXTENSION = "https://fhir.bbmri.de/StructureDefinition/JuridicalPerson"
 COLLECTION_TYPE_EXTENSION = "https://fhir.bbmri.de/StructureDefinition/CollectionType"
 DATA_CATEGORY_EXTENSION = "https://fhir.bbmri.de/StructureDefinition/DataCategory"
 CONTACT_ROLE_EXTENSION = "https://fhir.bbmri.de/StructureDefinition/ContactRole"
@@ -195,26 +207,37 @@ SPECIMEN_TYPE_MAP = {
 }
 
 AGE_UNIT_MAP = {
-    AgeUnit.YEARS: "a",
+    AgeUnit.YEARS: "y",
     AgeUnit.MONTHS: "mo",
     AgeUnit.WEEKS: "wk",
     AgeUnit.DAYS: "d",
 }
 
 STORAGE_TEMPERATURE_MAP = {
-    StorageTemperature.TEMP_18_TO_35: (
-        "temperature-18to-35",
-        "Degrees Celsius 2 to 10",
+    StorageTemperature.LNL: ("LiquidNitrogenLiquidPhase", "Liquid nitrogen"),
+    StorageTemperature.LNV: ("LiquidNitrogenVaporPhase", "Gaseous nitrogen"),
+    StorageTemperature.TEMP_LESS_MINUS_135: (
+        "temperatureLessMinus135",
+        "Temperature less than -135°C",
     ),
-    StorageTemperature.TEMP_60_TO_85: (
+    StorageTemperature.TEMP_MINUS_60_TO_MINUS_85: (
         "temperature-60to-85",
-        "Degrees Celsius -18 to -35",
+        "temperature -60°C to -85°C",
     ),
-    StorageTemperature.TEMP_2_TO_10: ("temperature2to10", "Degrees Celsius -60 to -85"),
-    StorageTemperature.GN: ("temperatureGN", "Gaseous nitrogen"),
-    StorageTemperature.LN: ("temperatureLN", "Liquid nitrogen"),
-    StorageTemperature.ROOM: ("temperatureRoom", "Room temperature"),
+    StorageTemperature.TEMP_MINUS_18_TO_MINUS_35: (
+        "temperature-18to-35",
+        "temperature -18°C to -35°C",
+    ),
+    StorageTemperature.TEMP_2_TO_10: ("temperature2to10", "temperature 2°C to 10°C"),
+    StorageTemperature.RT: ("RoomTemperature", "Room temperature"),
     StorageTemperature.OTHER: ("temperatureOther", "Other storage temperature"),
+}
+
+LOINC_MAP = {
+    "59284-0": "Patient Consent",
+    "57016-8": "Privacy policy acknowledgement Document",
+    "57017-6": "Privacy policy Organization Document",
+    "64292-6": "Release of information consent",
 }
 
 
@@ -237,11 +260,12 @@ class FHIRDest:
         patient_entry.request = BundleEntryRequest(
             {"method": "PUT", "url": f"Patient/{patient.id}"}
         )
+        patient_entry.fullUrl = f"/Patient/{patient.id}"
         return patient_entry
 
     def _create_condition_entry(self, patient_id, data):
         condition = Condition()
-        condition.id = self._transform_resource_id(data.id)
+        condition.id = transform_id(data.id)
         condition.meta = Meta({"profile": [CONDITION_PROFILE]})
 
         try:
@@ -252,8 +276,8 @@ class FHIRDest:
                         "value": data.age_at_event,
                     }
                 )
-            if data.date_at_event is not None:
-                osdt = FHIRDateTime(data.date_at_event.isoformat())
+            if data.event_date is not None:
+                osdt = FHIRDateTime(data.event_date.isoformat())
                 condition.onsetDateTime = osdt
                 condition.recordedDate = osdt
         except TypeError:
@@ -268,12 +292,37 @@ class FHIRDest:
             }
         )
 
-        condition.subject = FHIRReference({"reference": f"Patient/{patient_id}"})
+        condition.subject = FHIRReference(
+            {"reference": f"Patient/{transform_id(patient_id)}"}
+        )
 
         condition_entry = BundleEntry()
         condition_entry.resource = condition
         condition_entry.request = BundleEntryRequest(
             {"method": "PUT", "url": f"Condition/{condition.id}"}
+        )
+        condition_entry.fullUrl = f"/Condition/{condition.id}"
+        condition.category = [
+            CodeableConcept(
+                {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                            "code": "encounter-diagnosis",
+                        }
+                    ]
+                }
+            )
+        ]
+        condition.verificationStatus = CodeableConcept(
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                        "code": "confirmed",
+                    }
+                ]
+            }
         )
         return condition_entry
 
@@ -285,9 +334,9 @@ class FHIRDest:
         specimen.subject = FHIRReference({"reference": f"Patient/{patient_id}"})
 
         collected_date_time = None
-        for event in data.events:
+        for event in data.events:  # does not make sense. It's only one
             if isinstance(event, SamplingEvent):
-                collected_date_time = event.date_at_event
+                collected_date_time = event.event_date
 
         if data.anatomical_site is not None:
             specimen.collection = SpecimenCollection(
@@ -303,6 +352,10 @@ class FHIRDest:
                     },
                     "collectedDateTime": collected_date_time,
                 }
+            )
+        elif collected_date_time is not None:
+            specimen.collection = SpecimenCollection(
+                {"collectedDateTime": collected_date_time.strftime("%Y-%m-%d")}
             )
         specimen_types = []
         if data.type is not None:  # some values are not mapped to obib so skip them
@@ -331,8 +384,10 @@ class FHIRDest:
         specimen.type = CodeableConcept({"coding": specimen_types})
 
         disease_extensions = []
-        if data.creation_time is not None:
-            specimen.collection = SpecimenCollection({'collectedDateTime': data.creation_time.strftime('%Y-%m-%d')})
+        if data.creation_time is not None and specimen.collection is not None:
+            specimen.collection = SpecimenCollection(
+                {"collectedDateTime": data.creation_time.strftime("%Y-%m-%d")}
+            )
 
         if data.content_diagnosis is not None:
             for disease in data.content_diagnosis:
@@ -353,10 +408,8 @@ class FHIRDest:
                 )
 
         storage_temperature_extensions = []
-        print(data.storage_temperature)
         if data.storage_temperature is not None:
             for st in data.storage_temperature:
-                print(st)
                 storage_temperature_extensions.append(
                     Extension(
                         {
@@ -375,21 +428,27 @@ class FHIRDest:
                 )
 
         try:
-            specimen.extension = [
-                Extension(
-                    {
-                        "url": CUSTODIAN_EXTENSION,
-                        "valueReference": {
-                            "identifier": {
-                                "system": "https://bbmri-eric.eu/",
-                                "value": self._transform_resource_id(
-                                    data.collection.id
-                                ),
-                            }
-                        },
-                    }
-                )
-            ] + disease_extensions + storage_temperature_extensions
+            specimen.extension = (
+                [
+                    Extension(
+                        {
+                            "url": CUSTODIAN_EXTENSION,
+                            # "valueReference": {
+                            # "identifier": {
+                            #     "system": "https://bbmri-eric.eu/",
+                            #     "value": self._transform_resource_id(
+                            #         data.collection.id
+                            #     ),
+                            # }
+                            "valueReference": {
+                                "reference": f"Organization/{transform_id(data.collection.id)}"
+                            },
+                        }
+                    )
+                ]
+                + disease_extensions
+                + storage_temperature_extensions
+            )
         except KeyError:
             specimen.extension = disease_extensions + storage_temperature_extensions
 
@@ -398,7 +457,7 @@ class FHIRDest:
         specimen_entry.request = BundleEntryRequest(
             {"method": "PUT", "url": f"Specimen/{specimen.id}"}
         )
-
+        specimen.fullUrl = f"/Specimen/{specimen.id}"
         return specimen_entry
 
     def _create_specimens_entry(self, patient_id, data):
@@ -411,18 +470,107 @@ class FHIRDest:
     def _create_conditions_entry(self, patient_id, diagnosis_event):
         return [self._create_condition_entry(patient_id, de) for de in diagnosis_event]
 
-    @staticmethod
-    def _transform_resource_id(id_):
-        transformation = {
-            "/": "-",
-            "_": "-",
-            "(": "",
-            ")": "",
-            " ": "-",
-            "+": "",
-            ":": "-",
-        }
-        return id_.translate(str.maketrans(transformation))
+    def _create_consent_entry(self, consentin):
+        consent = FHIRConsent()
+        consent.id = transform_id(consentin.id)
+        consent.identifier = [Identifier({"value": consentin.id})]
+        consent.meta = Meta({"profile": [CONSENT_PROFILE]})
+        consent.scope = CodeableConcept(
+            {
+                "coding": [
+                    {
+                        "code": consentin.scope,
+                        "system": "http://terminology.hl7.org/CodeSystem/consentscope",
+                    }
+                ]
+            }
+        )
+        consent.category = [
+            CodeableConcept(
+                {
+                    "coding": [
+                        {
+                            "code": consentin.category.value,
+                            "system": "http://loinc.org",
+                            "display": LOINC_MAP[consentin.category],
+                        }
+                    ]
+                }
+            )
+        ]
+        consent.status = consentin.status
+        consent.dateTime = FHIRDateTime(
+            consentin.datetime_of_creation.isoformat().replace("+00:00", "Z")
+        )
+
+        consent.organization = [
+            FHIRReference(
+                {"reference": f"Organization/{transform_id(consentin.organization.id)}"}
+            )
+        ]
+        consent.policyRule = CodeableConcept(
+            {
+                "coding": [
+                    {
+                        "code": consentin.base_policy,
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    }
+                ]
+            }
+        )
+        consent.patient = FHIRReference(
+            {"reference": f"Patient/{transform_id(consentin.patient.id)}"}
+        )
+        consent.provision = ConsentProvision()
+        consent.provision.class_fhir = [
+            Coding(
+                {
+                    "code": consentin.main_class,
+                    "system": "http://hl7.org/fhir/resource-types",
+                }
+            )
+        ]
+        period = Period()
+        if consentin.end_time:
+            period.end = FHIRDateTime(
+                consentin.end_time.isoformat().replace("+00:00", "Z")
+            )
+        period.start = FHIRDateTime(
+            consentin.start_time.isoformat().replace("+00:00", "Z")
+        )
+        consent.provision.period = period
+
+        consent.provision.provision = []
+        for i, cc in enumerate(consentin.consent_conditions):
+            consent.provision.provision.append(ConsentProvision())
+            consent.provision.provision[i].code = [
+                CodeableConcept(
+                    {
+                        "coding": [
+                            {
+                                "code": cc.cce.value,
+                                "system": "https://fhir.bbmri.de/CodeSystem/common-conditions-elements-cs",
+                            }
+                        ]
+                    }
+                )
+            ]
+            consent.provision.provision[i].data = []
+            consent.provision.provision[i].type = cc.decision.value
+            for j, s in enumerate(cc.specimens):
+                consent.provision.provision[i].data.append(ConsentProvisionData())
+                consent.provision.provision[i].data[j].reference = FHIRReference(
+                    {"reference": f"Specimen/{transform_id(s.id)}"}
+                )
+                consent.provision.provision[i].data[j].meaning = consentin.meaning
+
+        consent_entry = BundleEntry()
+        consent_entry.resource = consent
+        consent_entry.request = BundleEntryRequest(
+            {"method": "PUT", "url": f"Consent/{consent.id}"}
+        )
+        consent.fullUrl = f"/Consent/{consent.id}"
+        return consent_entry
 
     def create_participant(self, record):
         b = Bundle()
@@ -444,6 +592,10 @@ class FHIRDest:
         for se in specimens_entries:
             b.entry.append(se)
 
+        if record.consent is not None:
+            consent_entry = self._create_consent_entry(record.consent)
+            b.entry.append(consent_entry)
+
         self.save(patient_entry.resource.id, b.as_json())
 
     def create_organizations(self, record: Aggregate):
@@ -452,15 +604,30 @@ class FHIRDest:
         b.entry = []
 
         resource = Organization()
-        resource.id = self._transform_resource_id(record.id)
+        resource.id = transform_id(record.id)
         resource.identifier = [
             Identifier({"system": BBMRI_ERIC_IDENTIFIER_SYSTEM, "value": record.id})
         ]
         resource.name = record.name
-        resource.acronym = record.acronym
-        resource.extension = [
-            Extension({"url": DESCRIPTION_EXTENSION, "valueString": record.description})
-        ]
+        resource.alias = record.acronym.split(",")
+        if isinstance(record, Biobank):
+            resource.extension = [
+                Extension(
+                    {"url": DESCRIPTION_EXTENSION, "valueString": record.description}
+                ),
+                Extension(
+                    {
+                        "url": JURIDICAL_PERSON_EXTENSION,
+                        "valueString": record.juristic_person,
+                    }
+                ),
+            ]
+        else:
+            resource.extension = [
+                Extension(
+                    {"url": DESCRIPTION_EXTENSION, "valueString": record.description}
+                )
+            ]
         resource.telecom = (
             [ContactPoint({"system": "url", "value": t}) for t in record.url]
             if record.url is not None
@@ -470,12 +637,16 @@ class FHIRDest:
         if record.contact:
             for c in record.contact:
                 contact = OrganizationContact()
-                if c.role.type == RoleType.HEAD and c.role.description is not None:
+                if (
+                    c.role.type == RoleType.HEAD
+                    or c.role.type == RoleType.DIRECTOR
+                    or c.role.type == RoleType.COLLECTION_POINT_OF_CONTACT
+                ):
                     contact.extension = [
                         Extension(
                             {
                                 "url": CONTACT_ROLE_EXTENSION,
-                                "valueString": c.role.description,
+                                "valueString": c.role.type.value,
                             }
                         )
                     ]
@@ -487,17 +658,25 @@ class FHIRDest:
                                 "code": (
                                     CONTACT_POINT_PURPOSE_ADMIN
                                     if c.role.type == RoleType.HEAD
+                                    or c.role.type == RoleType.DIRECTOR
                                     else CONTACT_POINT_PURPOSE_RESEARCH
                                 ),
-                            }
-                        ]
+                            },
+                        ],
+                        "text": (
+                            "head"
+                            if c.role.type in (RoleType.HEAD, RoleType.DIRECTOR)
+                            else "contact"
+                        ),
                     }
                 )
                 contact.name = HumanName(
                     {
                         "given": [c.name.given] if c.name is not None else None,
                         "family": c.name.family if c.name is not None else None,
-                        "prefix": c.name.prefix if c.name is not None else None,
+                        "prefix": (
+                            c.name.prefix.split(",") if c.name is not None else None
+                        ),
                         "suffix": c.name.suffix if c.name is not None else None,
                     }
                 )
@@ -505,8 +684,29 @@ class FHIRDest:
                     ContactPoint({"system": t.type.value, "value": t.value})
                     for t in c.telecom
                 ]
+                if c.address is not None:
+                    contact.address = Address(
+                        {
+                            "city": c.address.city,
+                            "country": c.address.country,
+                            "postalCode": c.address.zip,
+                            "line": [c.address.street],
+                        }
+                    )
+
                 contacts.append(contact)
         resource.contact = contacts
+
+        resource.address = [
+            Address(
+                {
+                    "city": record.address.city,
+                    "country": record.address.country,
+                    "postalCode": record.address.zip,
+                    "line": [record.address.street],
+                }
+            )
+        ]
 
         if isinstance(record, Biobank):
             resource.type = [CodeableConcept({"coding": [{"code": "Biobank"}]})]
@@ -550,9 +750,7 @@ class FHIRDest:
                 for c in record.data_category
             )
             resource.partOf = FHIRReference(
-                {
-                    "reference": f"Organization/{self._transform_resource_id(record.biobank.id)}"
-                }
+                {"reference": f"Organization/{transform_id(record.biobank.id)}"}
             )
 
         entry = BundleEntry()
@@ -560,6 +758,7 @@ class FHIRDest:
         entry.request = BundleEntryRequest(
             {"method": "PUT", "url": f"Organization/{resource.id}"}
         )
+        entry.fullUrl = f"/Organization/{resource.id}"
         b.entry.append(entry)
         self.save(resource.id, b.as_json())
 

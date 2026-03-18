@@ -30,8 +30,8 @@ class JsonFile(BaseOutput):
         self.output_dir = directory
 
     def serialize(self, file_name, obj):
-        with open(f'{self.output_dir}/{file_name}.json', 'w') as f:
-            json.dump(obj, f, indent=2)
+        with open(f"{self.output_dir}/{file_name}.json", "w") as f:
+            json.dump(obj, f, indent=2, ensure_ascii=False)
 
 
 class CSVFile(BaseOutput):
@@ -40,7 +40,7 @@ class CSVFile(BaseOutput):
         self.output_dir = directory
 
     def serialize(self, file_name, header, rows):
-        with open(f'{self.output_dir}/{file_name}.csv', 'w', newline='') as f:
+        with open(f"{self.output_dir}/{file_name}.csv", "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=header)
             writer.writeheader()
             writer.writerows(rows)

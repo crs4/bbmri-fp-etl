@@ -30,14 +30,17 @@ from pydantic.types import date
 
 
 class TelecomType(StrEnum):
-    URL = 'url'
-    EMAIL = 'email'
-    PHONE = 'phone'
+    URL = "url"
+    EMAIL = "email"
+    PHONE = "phone"
 
 
 class RoleType(StrEnum):
-    HEAD = 'head'
-    RESEARCHER = 'researcher'
+    HEAD = "Head"
+    RESEARCHER = "Researcher"
+    DIRECTOR = "Director"
+    RESEARCH_CONTACT = "Research_Contact"
+    COLLECTION_POINT_OF_CONTACT = "collection_point_of_contact"
 
 
 class CollectionType(StrEnum):
@@ -60,57 +63,57 @@ class CollectionType(StrEnum):
 
 
 class Country(StrEnum):
-    AU = 'AU'
-    AT = 'AT'
-    BY = 'BY'
-    BE = 'BE'
-    BG = 'BG'
-    CA = 'CA'
-    CN = 'CN'
-    HR = 'HR'
-    CY = 'CY'
-    CZ = 'CZ'
-    DK = 'DK'
-    EG = 'EG'
-    FI = 'FI'
-    FR = 'FR'
-    DE = 'DE'
-    GR = 'GR'
-    HU = 'HU'
-    IE = 'IE'
-    IL = 'IL'
-    IT = 'IT'
-    JP = 'JP'
-    MT = 'MT'
-    MX = 'MX'
-    NL = 'NL'
-    NZ = 'NZ'
-    NO = 'NO'
-    PL = 'PL'
-    PT = 'PT'
-    RS = 'RS'
-    SI = 'SI'
-    ES = 'ES'
-    SE = 'SE'
-    CH = 'CH'
-    TR = 'TR'
-    UA = 'UA'
-    UK = 'UK'
-    US = 'US'
+    AU = "AU"
+    AT = "AT"
+    BY = "BY"
+    BE = "BE"
+    BG = "BG"
+    CA = "CA"
+    CN = "CN"
+    HR = "HR"
+    CY = "CY"
+    CZ = "CZ"
+    DK = "DK"
+    EG = "EG"
+    FI = "FI"
+    FR = "FR"
+    DE = "DE"
+    GR = "GR"
+    HU = "HU"
+    IE = "IE"
+    IL = "IL"
+    IT = "IT"
+    JP = "JP"
+    MT = "MT"
+    MX = "MX"
+    NL = "NL"
+    NZ = "NZ"
+    NO = "NO"
+    PL = "PL"
+    PT = "PT"
+    RS = "RS"
+    SI = "SI"
+    ES = "ES"
+    SE = "SE"
+    CH = "CH"
+    TR = "TR"
+    UA = "UA"
+    UK = "UK"
+    US = "US"
 
 
 class Sex(StrEnum):
-    MALE = 'M'
-    FEMALE = 'F'
-    UNKNOWN = 'U'
-    UNDIFFERENTIATED = 'D'
+    MALE = "M"
+    FEMALE = "F"
+    UNKNOWN = "U"
+    UNDIFFERENTIATED = "D"
 
 
 class AgeUnit(StrEnum):
-    YEARS = 'years'
-    MONTHS = 'months'
-    WEEKS = 'weeks'
-    DAYS = 'days'
+    YEARS = "years"
+    MONTHS = "months"
+    WEEKS = "weeks"
+    DAYS = "days"
 
 
 class SampleTypeOntologyTuple(NamedTuple):
@@ -120,127 +123,300 @@ class SampleTypeOntologyTuple(NamedTuple):
 
 
 class SampleType(Enum):
-    AMNIOTIC_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                             "http://purl.obolibrary.org/obo/OBI_0002500", "amniotic fluid specimen")
-    ASCITES_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                            "http://purl.obolibrary.org/obo/UBERON_0007795", "ascitic fluid")
-    BILE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                   "http://purl.obolibrary.org/obo/OBI_0002501", "bile specimen")
-    BODY_CAVITY_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                "http://purl.obolibrary.org/obo/OBI_2000009", "bodily fluid specimen")
-    BONE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                   "http://purl.obolibrary.org/obo/UBERON_0001474", "bone element")
-    BONE_MARROW_ASPIRATE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                   "http://purl.obolibrary.org/obo/OBI_0002512", "bone marrow")
-    BONE_MARROW_PLASMA = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                 "http://purl.obolibrary.org/obo/OBI_0002512", "bone marrow")
-    BONE_MARROW_WHOLE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                "http://purl.obolibrary.org/obo/OBI_0002512", "bone marrow")
-    BREAST_MILK = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                          "http://purl.obolibrary.org/obo/OBI_0002505", "milk specimen")
-    BRONCHOALVEOLAR_LAVAGE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                     "http://purl.obolibrary.org/obo/OBI_0100067",
-                                                     "bronchial alveolar lavage")
-    BUFFY_COAT = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                         "http://purl.obolibrary.org/obo/OBIB_0000036", "buffy coat specimen")
-    CANCER_CELL_LINES = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obi.owl",
-                                                "http://purl.obolibrary.org/obo/OBI_0001906", "cancer cell line")
-    CEREBROSPINAL_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                  "http://purl.obolibrary.org/obo/OBI_0002502",
-                                                  "cerebrospinal fluid specimen")
-    CORD_BLOOD = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                         "http://purl.obolibrary.org/obo/OBI_2000012", "umbilical cord blood specimen")
-    DENTAL_PULP = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                          "http://purl.obolibrary.org/obo/UBERON_0001754", "dental pulp")
+    ANY = SampleTypeOntologyTuple(
+        None,
+        None,
+        "any sample type",
+    )
+    AMNIOTIC_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002500",
+        "amniotic fluid specimen",
+    )
+    ASCITES_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0007795",
+        "ascitic fluid",
+    )
+    BILE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002501",
+        "bile specimen",
+    )
+    BODY_CAVITY_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_2000009",
+        "bodily fluid specimen",
+    )
+    BONE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0001474",
+        "bone element",
+    )
+    BONE_MARROW_ASPIRATE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002512",
+        "bone marrow",
+    )
+    BONE_MARROW_PLASMA = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002512",
+        "bone marrow",
+    )
+    BONE_MARROW_WHOLE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002512",
+        "bone marrow",
+    )
+    BREAST_MILK = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002505",
+        "milk specimen",
+    )
+    BRONCHOALVEOLAR_LAVAGE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0100067",
+        "bronchial alveolar lavage",
+    )
+    BUFFY_COAT = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBIB_0000036",
+        "buffy coat specimen",
+    )
+    CANCER_CELL_LINES = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obi.owl",
+        "http://purl.obolibrary.org/obo/OBI_0001906",
+        "cancer cell line",
+    )
+    CEREBROSPINAL_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002502",
+        "cerebrospinal fluid specimen",
+    )
+    CORD_BLOOD = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_2000012",
+        "umbilical cord blood specimen",
+    )
+    DENTAL_PULP = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0001754",
+        "dental pulp",
+    )
     DIGITAL_SAMPLE = SampleTypeOntologyTuple(None, None, None)
-    DNA = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                  "http://purl.obolibrary.org/obo/OBI_0001051", "DNA extract")
-    EMBRYO = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                     "http://purl.obolibrary.org/obo/UBERON_0005291", "embryonic tissue")
-    ENTIRE_BODY_ORGAN = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                                "http://purl.obolibrary.org/obo/UBERON_0000062", "organ")
-    FECES = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                    "http://purl.obolibrary.org/obo/OBI_0002503", "feces specimen")
-    FETAL_TISSUE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                           "http://purl.obolibrary.org/obo/UBERON_0005291", "embryonic tissue")
-    FIBROBLASTS = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/cl.owl",
-                                          "http://purl.obolibrary.org/obo/CL_0000057", "fibroblasts")
+    DNA = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0001051",
+        "DNA extract",
+    )
+    EMBRYO = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0005291",
+        "embryonic tissue",
+    )
+    ENTIRE_BODY_ORGAN = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0000062",
+        "organ",
+    )
+    FECES = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002503",
+        "feces specimen",
+    )
+    FETAL_TISSUE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0005291",
+        "embryonic tissue",
+    )
+    FIBROBLASTS = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/cl.owl",
+        "http://purl.obolibrary.org/obo/CL_0000057",
+        "fibroblasts",
+    )
     GAS_EXHALED_BREATH = SampleTypeOntologyTuple(None, None, None)
-    GASTRIC_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                            "http://purl.obolibrary.org/obo/UBERON_0001971", "gastric juice")
-    HAIR = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                   "http://purl.obolibrary.org/obo/OBI_0002517", "hair specimen")
-    IMMORTALIZED_CELL_LINES = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obi.owl",
-                                                      "http://purl.obolibrary.org/obo/CLO_0009828",
-                                                      "immortal cell line")
-    ISOLATED_MICROBES = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                "http://purl.obolibrary.org/obo/IDO_0000528", "pathogen")
+    GASTRIC_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0001971",
+        "gastric juice",
+    )
+    HAIR = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002517",
+        "hair specimen",
+    )
+    IMMORTALIZED_CELL_LINES = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obi.owl",
+        "http://purl.obolibrary.org/obo/CLO_0009828",
+        "immortal cell line",
+    )
+    ISOLATED_MICROBES = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/IDO_0000528",
+        "pathogen",
+    )
     MENSTRUAL_BLOOD = SampleTypeOntologyTuple(None, None, None)
-    NAIL = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                   "http://purl.obolibrary.org/obo/UBERON_0001705", "nail")
+    NAIL = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0001705",
+        "nail",
+    )
     NASAL_WASHING = SampleTypeOntologyTuple(None, None, None)
-    PERICARDIAL_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                "http://purl.obolibrary.org/obo/OBI_0002506",
-                                                "pericardial fluid specimen")
-    PBMC = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/cl.owl", "http://purl.obolibrary.org/obo/CL_2000001",
-                                   "peripheral blood mononuclear cell")
-    PLACENTA = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                       "http://purl.obolibrary.org/obo/OBI_0002513", "placenta specimen")
-    PLASMA = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                     "http://purl.obolibrary.org/obo/OBI_0100016", "blood plasma specimen")
-    PLEURAL_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                            "http://purl.obolibrary.org/obo/OBI_0002515", "pleural fluid specimen")
-    PRIMARY_CELLS = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/cl.owl",
-                                            "http://purl.obolibrary.org/obo/CL_0000001", "primary cultured cell")
-    POSTMORTEM_TISSUE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obi.owl",
-                                                "http://purl.obolibrary.org/obo/OBI_0000902", "post-mortem specimen")
-    PROTEINS = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                       "http://purl.obolibrary.org/obo/PR_000000001", "protein")
-    RED_BLOOD_CELLS = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/cl.owl",
-                                              "http://purl.obolibrary.org/obo/CL_0000232", "erythrocyte")
-    RNA = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                  "http://purl.obolibrary.org/obo/OBI_0000880", "RNA extract")
-    SALIVA = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                     "http://purl.obolibrary.org/obo/OBI_0002507", "saliva specimen")
-    SEMEN = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                    "http://purl.obolibrary.org/obo/OBI_2000008", "semen specimen")
-    SERUM = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                    "http://purl.obolibrary.org/obo/OBI_0100017", "blood serum specimen")
-    SPUTUM = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                     "http://purl.obolibrary.org/obo/OBI_0002508", "sputum specimen")
-    STEM_IPS_CELLS = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/cl.owl",
-                                             "http://purl.obolibrary.org/obo/CL_0000034", "stem cells")
-    SWAB = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                   "http://purl.obolibrary.org/obo/OBI_0002599", "swab specimen")
-    SWEAT = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                    "http://purl.obolibrary.org/obo/OBI_0002509", "sweat specimen")
-    SYNOVIAL_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                             "http://purl.obolibrary.org/obo/OBI_0002510", "synovial specimn fluid")
-    TEARS = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                    "http://purl.obolibrary.org/obo/UBERON_0001827", "secretion of lacrimal gland")
-    TEETH = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                    "http://purl.obolibrary.org/obo/UBERON_0001091", "calcareus tooth")
-    TISSUE_FROZEN_OR_FFPE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                    "http://purl.obolibrary.org/obo/OBI_0001472",
-                                                    "specimen with known storage state")
-    TISSUE_FROZEN = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                            "http://purl.obolibrary.org/obo/OBI_0000922", "Frozen Specimen")
-    TISSUE_FFPE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                          "http://purl.obolibrary.org/obo/OBI_1200000", "FFPE Specimen")
-    UMBILICAL_CORD = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/uberon.owl",
-                                             "http://purl.obolibrary.org/obo/UBERON_0002331", "umbilical cord")
-    URINE = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                    "http://purl.obolibrary.org/obo/OBI_0000651", "urine specimen")
-    URINE_SEDIMENT = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                             "http://purl.obolibrary.org/obo/OBI_0000651", "urine specimen")
-    VITREOUS_FLUID = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                             "http://purl.obolibrary.org/obo/OBI_0002511", "vitreous humor specimen")
-    WHOLE_BLOOD = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                          "http://purl.obolibrary.org/obo/OBI_0000655", "blood specimen")
-    WHOLE_BLOOD_DRIED = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                                "http://purl.obolibrary.org/obo/OBI_0000655", "blood specimen")
-    VENOUS_BLOOD = SampleTypeOntologyTuple("http://purl.obolibrary.org/obo/obib.owl",
-                                           "http://purl.obolibrary.org/obo/OBI_2000014", "venous blood specimen")
+    PERICARDIAL_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002506",
+        "pericardial fluid specimen",
+    )
+    PBMC = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/cl.owl",
+        "http://purl.obolibrary.org/obo/CL_2000001",
+        "peripheral blood mononuclear cell",
+    )
+    PLACENTA = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002513",
+        "placenta specimen",
+    )
+    PLASMA = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0100016",
+        "blood plasma specimen",
+    )
+    PLEURAL_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002515",
+        "pleural fluid specimen",
+    )
+    PRIMARY_CELLS = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/cl.owl",
+        "http://purl.obolibrary.org/obo/CL_0000001",
+        "primary cultured cell",
+    )
+    POSTMORTEM_TISSUE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obi.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000902",
+        "post-mortem specimen",
+    )
+    PROCESSED_SPECIMEN = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obi.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000953",
+        "processed specimen",
+    )
+    PROTEINS = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/PR_000000001",
+        "protein",
+    )
+    RED_BLOOD_CELLS = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/cl.owl",
+        "http://purl.obolibrary.org/obo/CL_0000232",
+        "erythrocyte",
+    )
+    RNA = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000880",
+        "RNA extract",
+    )
+    SALIVA = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002507",
+        "saliva specimen",
+    )
+    SEMEN = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_2000008",
+        "semen specimen",
+    )
+    SERUM = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0100017",
+        "blood serum specimen",
+    )
+    SPUTUM = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002508",
+        "sputum specimen",
+    )
+    STEM_IPS_CELLS = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/cl.owl",
+        "http://purl.obolibrary.org/obo/CL_0000034",
+        "stem cells",
+    )
+    SWAB = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002599",
+        "swab specimen",
+    )
+    SWEAT = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002509",
+        "sweat specimen",
+    )
+    SYNOVIAL_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002510",
+        "synovial specimen fluid",
+    )
+    TEARS = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0001827",
+        "secretion of lacrimal gland",
+    )
+    TEETH = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0001091",
+        "calcareus tooth",
+    )
+    TISSUE_FROZEN_OR_FFPE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0001472",
+        "specimen with known storage state",
+    )
+    TISSUE_FROZEN = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000922",
+        "Frozen Specimen",
+    )
+    TISSUE_FFPE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_1200000",
+        "FFPE Specimen",
+    )
+    UMBILICAL_CORD = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/uberon.owl",
+        "http://purl.obolibrary.org/obo/UBERON_0002331",
+        "umbilical cord",
+    )
+    URINE = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000651",
+        "urine specimen",
+    )
+    URINE_SEDIMENT = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000651",
+        "urine specimen",
+    )
+    VITREOUS_FLUID = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0002511",
+        "vitreous humor specimen",
+    )
+    WHOLE_BLOOD = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000655",
+        "blood specimen",
+    )
+    WHOLE_BLOOD_DRIED = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_0000655",
+        "blood specimen",
+    )
+    VENOUS_BLOOD = SampleTypeOntologyTuple(
+        "http://purl.obolibrary.org/obo/obib.owl",
+        "http://purl.obolibrary.org/obo/OBI_2000014",
+        "venous blood specimen",
+    )
     OTHER = SampleTypeOntologyTuple(None, None, None)
 
 
@@ -248,27 +424,28 @@ class CollectionSampleType(StrEnum):
     """
     In MIABIS 3 Collections use an aggregated version of Material Type
     """
-    BUFFY_COAT = 'BUFFY_COAT'
-    CDNA = 'CDNA'
-    CELL_LINES = 'CELL_LINES'
-    DNA = 'DNA'
-    FECES = 'FECES'
-    MICRO_RNA = 'MICRO_RNA'
-    NASAL_SWAB = 'NASAL_SWAB'
-    NAV = 'NAV'
-    OTHER = 'OTHER'
-    PATHOGEN = 'PATHOGEN'
-    PERIPHERAL_BLOOD_CELLS = 'PERIPHERAL_BLOOD_CELLS'
-    PLASMA = 'PLASMA'
-    RNA = 'RNA'
-    SALIVA = 'SALIVA'
-    SERUM = 'SERUM'
-    THROAT_SWAB = 'THROAT_SWAB'
-    TISSUE_FROZEN = 'TISSUE_FROZEN'
-    TISSUE_PARAFFIN_EMBEDDED = 'TISSUE_PARAFFIN_EMBEDDED'
-    TISSUE_STAINED = 'TISSUE_STAINED'
-    URINE = 'URINE'
-    WHOLE_BLOOD = 'WHOLE_BLOOD'
+
+    BUFFY_COAT = "BUFFY_COAT"
+    CDNA = "CDNA"
+    CELL_LINES = "CELL_LINES"
+    DNA = "DNA"
+    FECES = "FECES"
+    MICRO_RNA = "MICRO_RNA"
+    NASAL_SWAB = "NASAL_SWAB"
+    NAV = "NAV"
+    OTHER = "OTHER"
+    PATHOGEN = "PATHOGEN"
+    PERIPHERAL_BLOOD_CELLS = "PERIPHERAL_BLOOD_CELLS"
+    PLASMA = "PLASMA"
+    RNA = "RNA"
+    SALIVA = "SALIVA"
+    SERUM = "SERUM"
+    THROAT_SWAB = "THROAT_SWAB"
+    TISSUE_FROZEN = "TISSUE_FROZEN"
+    TISSUE_PARAFFIN_EMBEDDED = "TISSUE_PARAFFIN_EMBEDDED"
+    TISSUE_STAINED = "TISSUE_STAINED"
+    URINE = "URINE"
+    WHOLE_BLOOD = "WHOLE_BLOOD"
 
 
 class DataCategory(StrEnum):
@@ -290,25 +467,26 @@ class DataCategory(StrEnum):
 
 
 class StorageTemperature(StrEnum):
-    TEMP_18_TO_35 = "temperature-18to-35"
-    TEMP_60_TO_85 = "temperature-60to-85"
+    LNL = "LiquidNitrogenLiquidPhase"
+    LNV = "LiquidNitrogenVaporPhase"
+    TEMP_LESS_MINUS_135 = "temperatureLessMinus135"
+    TEMP_MINUS_60_TO_MINUS_85 = "temperature-60to-85"
+    TEMP_MINUS_18_TO_MINUS_35 = "temperature-18to-35"
     TEMP_2_TO_10 = "temperature2to10"
-    GN = "temperatureGN"
-    LN = "temperatureLN"
-    ROOM = "temperatureRoom"
+    RT = "RoomTemperature"
     OTHER = "temperatureOther"
 
 
 class DiseaseOntology(StrEnum):
-    ORPHANET = 'http://www.orpha.net/ORDO/'
-    ICD_10 = 'http://hl7.org/fhir/sid/icd-10'
-    SNOMED = 'https://www.snomed.org/'
+    ORPHANET = "http://www.orpha.net/ORDO/"
+    ICD_10 = "http://hl7.org/fhir/sid/icd-10"
+    SNOMED = "https://www.snomed.org/"
 
 
 class AnatomicalSiteOntology(StrEnum):
-    UBERON = 'http://purl.obolibrary.org/obo/uberon.owl'
-    ICD_O_3 = 'icd-3'
-    SNOMED = 'https://www.snomed.org/'
+    UBERON = "http://purl.obolibrary.org/obo/uberon.owl"
+    ICD_O_3 = "icd-3"
+    SNOMED = "https://www.snomed.org/"
 
 
 class Name(BaseModel):
@@ -373,16 +551,18 @@ class Disease(BaseModel):
 
 class Aggregate(BaseModel):
     id: str
+    name: str
+    alias: Optional[str] = Field(default=None)
     acronym: Optional[str] = Field(default=None)
-    name: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     url: Optional[List[str]] = Field(default_factory=list)
     contact: Optional[List[Contact]] = Field(default_factory=list)
-    country: Optional[Country] = Field(default=None)
+    # country: Optional[Country] = Field(default=None)
+    address: Optional[Address] = Field(default=None)
 
 
 class Biobank(Aggregate):
-    jurystic_person: str
+    juristic_person: str
 
 
 class Collection(Aggregate):
@@ -399,19 +579,20 @@ class Collection(Aggregate):
 
 
 class EventType(StrEnum):
-    DIAGNOSIS = 'diagnosis'
-    SURGERY = 'surgery'
-    RADIATION_THERAPY = 'radiation therapy'
-    TARGETED_THERAPY = 'targeted therapy'
-    PHARMACOTHERAPY = 'pharmacotherapy'
-    RESPONSE_TO_THERAPY = 'response to therapy'
+    DIAGNOSIS = "diagnosis"
+    SURGERY = "surgery"
+    RADIATION_THERAPY = "radiation therapy"
+    TARGETED_THERAPY = "targeted therapy"
+    PHARMACOTHERAPY = "pharmacotherapy"
+    RESPONSE_TO_THERAPY = "response to therapy"
+    SPECIMEN_COLLECTION = "specimen collection"
 
 
 class Event(BaseModel):
     id: str
     age_at_event: Optional[int] = Field(default=None)
     age_at_event_unit: Optional[AgeUnit] = Field(default=None)
-    date_at_event: Optional[date] = Field(default=None)
+    event_date: Optional[date] = Field(default=None)
     event_type: Optional[EventType] = Field(default=None)
 
 
@@ -428,17 +609,20 @@ class Sample(BaseModel):
     id: str
     type: SampleType  # the MIABIS Sample Type
     additional_types: List[SampleTypeOntologyCode] = Field(
-        default_factory=list)  # A list of other Sample Type if needed
+        default_factory=list
+    )  # A list of other Sample Type if needed
     content_diagnosis: Optional[List[Disease]] = Field(default_factory=list)
     creation_time: Optional[datetime] = Field(default=None)
     events: List[Event]
     collection: Collection
     anatomical_site: Optional[AnatomicalSiteOntologyCode] = Field(default=None)
-    storage_temperature: Optional[List[StorageTemperature]] = Field(default_factory=list)
+    storage_temperature: Optional[List[StorageTemperature]] = Field(
+        default_factory=list
+    )
 
 
 class StatusOntology(StrEnum):
-    OMOP = 'https://athena.ohdsi.org/search-terms/terms?domain=Condition+Status&standardConcept=Standard'
+    OMOP = "https://athena.ohdsi.org/search-terms/terms?domain=Condition+Status&standardConcept=Standard"
 
 
 class StatusOntologyCode(BaseModel):
@@ -458,6 +642,83 @@ class SamplingEvent(Event):
     pass
 
 
+class CCE(StrEnum):
+    legal_framework = "Legal and Regulatory Framework"
+    commercial_entity = "Commercial Entity"
+    return_to_provider = "Return to Provider"
+    participant_recontact = "Participant Recontact"
+    immort_cell_lines = "Immortalised Cell Lines"
+    induc_plurip_stem_cells = "Induced Pluripotent Stem Cells"
+    organoids = "Organoids"
+    data_linkage = "Data Linkage"
+    postmortem = "Data/sample Post-mortem Use"
+    nucleid_acid_sequence = "Nucleid Acid Sequence"
+    artificial_intelligence = "Artificial Intelligence"
+
+
+class ConsentScope(StrEnum):
+    advanced_care_directive = "adr"
+    research = "research"
+    patient_privacy_consent = "patient-privacy"
+    treatment = "treatment"
+
+
+class ConsentCategory(StrEnum):
+    patient_consent = "59284-0"
+    privacy_policy_ack = "57016-8"
+    privacy_policy_org = "57017-6"
+    release_of_consent = "64292-6"
+
+
+class ConsentStatus(StrEnum):
+    draft = "draft"
+    proposed = "proposed"
+    active = "active"
+    rejected = "rejected"
+    inactive = "inactive"
+    entered_in_error = "entered_in_error"
+
+
+class CCEDecision(StrEnum):
+    permit = "permit"
+    deny = "deny"
+
+
+class ConsentBasePolicy(StrEnum):
+    consent_directive = "_ActConsentDirective"
+
+
+class ConsentMainClass(StrEnum):
+    specimen = "specimen"
+
+
+class ConsentMeaning(StrEnum):
+    instance = "instance"
+
+
+class ConsentCondition(BaseModel):
+    cce: CCE
+    decision: CCEDecision
+    specimens: List[Sample]
+
+
+class Consent(BaseModel):
+    id: str
+    scope: ConsentScope
+    category: ConsentCategory
+    status: ConsentStatus
+    datetime_of_creation: datetime
+    organization: Biobank
+    base_policy: ConsentBasePolicy
+    meaning: ConsentMeaning
+    main_class: ConsentMainClass
+    start_time: Optional[datetime] = Field(default=None)
+    end_time: Optional[datetime] = Field(default=None)
+    patient: Donor
+    consent_conditions: List[ConsentCondition]
+
+
 class Case(BaseModel):
     donor: Donor
     samples: List[Sample]
+    consent: Optional[Consent] = None
