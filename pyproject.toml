@@ -17,8 +17,6 @@ PyYAML = "^6.0.3"
 typing-extensions = "^4.1.1"
 roman = "^4.2"
 pydantic = "^2.10.3"
-molgenis-py-client = "^2.4.1"
-molgenis-emx2-pyclient = "^13.165.2"
 
 [tool.group.poetry.dev.dependencies]
 
