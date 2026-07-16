@@ -677,7 +677,9 @@ class FHIRDest:
                         "prefix": (
                             c.name.prefix.split(",") if c.name is not None else None
                         ),
-                        "suffix": c.name.suffix if c.name is not None else None,
+                        "suffix": (
+                            c.name.suffix.split(",") if c.name is not None else None
+                        ),
                     }
                 )
                 contact.telecom = [
